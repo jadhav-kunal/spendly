@@ -1,4 +1,4 @@
-// ─── Domain Types ────────────────────────────────────────────────────────────
+// ─── Domain Types ─────────────────────────────────────────────────────────────
 
 export interface Expense {
   id: string;
@@ -7,12 +7,11 @@ export interface Expense {
   description?: string;
   category: ExpenseCategory;
   amount: number;
-  expense_date: string; // ISO date string "YYYY-MM-DD"
+  expense_date: string;
   createdAt: string;
   updatedAt: string;
 }
 
-/** Union of all valid category values */
 export type ExpenseCategory =
   | 'food'
   | 'transport'
@@ -26,12 +25,11 @@ export type ExpenseCategory =
 
 // ─── Form Types ───────────────────────────────────────────────────────────────
 
-/** The shape of the add/edit form before submission */
 export interface ExpenseFormData {
   title: string;
   description: string;
   category: ExpenseCategory | '';
-  amount: string;       // string in form, coerced to number on submit
+  amount: string;
   expense_date: string;
 }
 
@@ -69,6 +67,22 @@ export type ExpenseAction =
   | { type: 'HYDRATE_FROM_STORAGE'; payload: Expense[] }
   | { type: 'SET_LOADING';          payload: boolean }
   | { type: 'SET_ERROR';            payload: string | null };
+
+// ─── Context Type ─────────────────────────────────────────────────────────────
+
+export interface ExpenseContextValue {
+  state: ExpenseState;
+  addExpense: (data: ExpenseFormData) => void;
+  editExpense: (id: string, data: ExpenseFormData) => void;
+  deleteExpense: (id: string) => void;
+  setFilter: (filter: FilterConfig) => void;
+  setSearch: (search: string) => void;
+  setSort: (sort: SortConfig) => void;
+  filteredExpenses: Expense[];
+  totalSpent: number;
+  monthlySpent: number;
+  categoryCount: number;
+}
 
 // ─── API Types ────────────────────────────────────────────────────────────────
 

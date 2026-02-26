@@ -1,5 +1,3 @@
-// Action type string constants.
-
 export const ADD_EXPENSE          = 'ADD_EXPENSE'          as const;
 export const EDIT_EXPENSE         = 'EDIT_EXPENSE'         as const;
 export const DELETE_EXPENSE       = 'DELETE_EXPENSE'       as const;

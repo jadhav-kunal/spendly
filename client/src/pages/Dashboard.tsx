@@ -1,6 +1,16 @@
 import React from 'react';
+import { useExpenseContext } from '@/context/ExpenseContext.tsx';
+import { formatCurrency } from '@/utils/formatters.ts';
 
 export default function Dashboard(): React.JSX.Element {
+  const { totalSpent, monthlySpent, categoryCount } = useExpenseContext();
+
+  const stats = [
+    { label: 'Total Spent',  value: formatCurrency(totalSpent)   },
+    { label: 'This Month',   value: formatCurrency(monthlySpent) },
+    { label: 'Categories',   value: String(categoryCount)        },
+  ];
+
   return (
     <div className="animate-fade-in">
       <div className="mb-8">
@@ -14,21 +24,26 @@ export default function Dashboard(): React.JSX.Element {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
+        {/* Live stats */}
         <div className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {['Total Spent', 'This Month', 'Categories'].map((label) => (
-            <div key={label} className="card-elevated p-5 animate-slide-up">
-              <p className="label">{label}</p>
-              <div className="h-7 w-24 bg-surface-3 rounded-lg mt-2 animate-pulse" />
+          {stats.map((stat) => (
+            <div key={stat.label} className="card-elevated p-5 animate-slide-up">
+              <p className="label">{stat.label}</p>
+              <p className="font-display font-bold text-2xl text-white mt-1">
+                {stat.value}
+              </p>
             </div>
           ))}
         </div>
 
+        {/* Form region */}
         <div className="lg:col-span-1">
           <div className="card-elevated p-5 min-h-[300px] flex items-center justify-center">
             <p className="text-muted text-sm font-display tracking-wider">FORM</p>
           </div>
         </div>
 
+        {/* List region */}
         <div className="lg:col-span-2">
           <div className="card-elevated p-5 min-h-[300px] flex items-center justify-center">
             <p className="text-muted text-sm font-display tracking-wider">LIST</p>
