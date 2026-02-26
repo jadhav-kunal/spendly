@@ -1,0 +1,51 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    @apply bg-surface text-white font-body;
+    min-height: 100vh;
+  }
+
+  ::-webkit-scrollbar       { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { @apply bg-surface-1; }
+  ::-webkit-scrollbar-thumb { @apply bg-surface-4 rounded-full; }
+  ::-webkit-scrollbar-thumb:hover { @apply bg-accent-dim; }
+
+  ::selection { @apply bg-accent text-white; }
+}
+
+@layer components {
+  .card          { @apply bg-surface-1 border border-border rounded-2xl; }
+  .card-elevated { @apply bg-surface-2 border border-border rounded-2xl shadow-card; }
+
+  .btn { @apply inline-flex items-center justify-center gap-2 font-display font-semibold transition-all duration-150 ease-out select-none cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed; }
+
+  .btn-primary { @apply btn bg-accent text-white rounded-xl px-5 py-2.5 text-sm shadow-neo hover:translate-x-px hover:translate-y-px hover:shadow-neo-sm active:translate-x-1 active:translate-y-1 active:shadow-none; }
+
+  .btn-ghost   { @apply btn text-muted hover:text-white hover:bg-surface-3 rounded-xl px-4 py-2.5 text-sm; }
+
+  .btn-danger  { @apply btn bg-danger text-white rounded-xl px-5 py-2.5 text-sm shadow-neo-danger hover:translate-x-px hover:translate-y-px active:translate-x-1 active:translate-y-1 active:shadow-none; }
+
+  .input { @apply w-full bg-surface-2 border border-border rounded-xl px-4 py-2.5 text-sm text-white placeholder-muted font-body focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/30 transition-colors duration-150; }
+
+  .input-error { @apply border-danger focus:border-danger focus:ring-danger/30; }
+
+  .label { @apply block text-xs font-display font-semibold text-muted uppercase tracking-widest mb-1.5; }
+
+  .badge { @apply inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-display font-semibold; }
+
+  .divider { @apply border-t border-border; }
+}
+
+@layer utilities {
+  .text-gradient { @apply bg-gradient-to-r from-accent-glow to-accent bg-clip-text text-transparent; }
+}
