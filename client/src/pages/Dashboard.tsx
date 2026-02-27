@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useExpenseContext } from '@/context/ExpenseContext.tsx';
 import { formatCurrency } from '@/utils/formatters.ts';
 import ExpenseForm from '@/components/expenses/ExpenseForm.tsx';
+import ExpenseList from '@/components/expenses/ExpenseList.tsx';
 import type { Expense } from '@/types/index.ts';
 
 export default function Dashboard(): React.JSX.Element {
@@ -9,9 +10,9 @@ export default function Dashboard(): React.JSX.Element {
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
 
   const stats = [
-    { label: 'Total Spent',  value: formatCurrency(totalSpent)   },
-    { label: 'This Month',   value: formatCurrency(monthlySpent) },
-    { label: 'Categories',   value: String(categoryCount)        },
+    { label: 'Total Spent', value: formatCurrency(totalSpent)   },
+    { label: 'This Month',  value: formatCurrency(monthlySpent) },
+    { label: 'Categories',  value: String(categoryCount)        },
   ];
 
   return (
@@ -27,7 +28,7 @@ export default function Dashboard(): React.JSX.Element {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-        {/* Live stats */}
+        {/* Stats */}
         <div className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-3 gap-4">
           {stats.map((stat) => (
             <div key={stat.label} className="card-elevated p-5 animate-slide-up">
@@ -47,11 +48,9 @@ export default function Dashboard(): React.JSX.Element {
           />
         </div>
 
-        {/* List region */}
+        {/* List */}
         <div className="lg:col-span-2">
-          <div className="card-elevated p-5 min-h-[300px] flex items-center justify-center">
-            <p className="text-muted text-sm font-display tracking-wider">LIST</p>
-          </div>
+          <ExpenseList onEdit={(expense) => setEditingExpense(expense)} />
         </div>
 
       </div>
