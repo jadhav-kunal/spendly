@@ -11,7 +11,7 @@ export function validateAmount(value: string | number): string | null {
   if (value === '' || value === null || value === undefined) return 'Amount is required';
   const num = Number(value);
   if (isNaN(num) || num <= 0) return 'Must be a positive number';
-  if (!Number.isInteger(num)) return 'Whole numbers only (no decimals)';
+  if (Math.round(num * 100) / 100 !== parseFloat(num.toFixed(2))) return 'Max 2 decimal places';
   if (num > 10_000_000) return 'Amount is too large';
   return null;
 }
@@ -27,6 +27,11 @@ export function validateDate(value: string): string | null {
   return null;
 }
 
+export function validateDescription(value: string): string | null {
+  if (value.length > 420) return 'Description must be under 420 characters';
+  return null;
+}
+
 export function validateExpenseForm(form: ExpenseFormData): {
   errors: FormErrors;
   isValid: boolean;
@@ -36,6 +41,7 @@ export function validateExpenseForm(form: ExpenseFormData): {
     amount:       validateAmount(form.amount),
     category:     validateCategory(form.category),
     expense_date: validateDate(form.expense_date),
+    description:  validateDescription(form.description),
   };
   return {
     errors,

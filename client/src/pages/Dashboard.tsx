@@ -1,9 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useExpenseContext } from '@/context/ExpenseContext.tsx';
 import { formatCurrency } from '@/utils/formatters.ts';
+import ExpenseForm from '@/components/expenses/ExpenseForm.tsx';
+import type { Expense } from '@/types/index.ts';
 
 export default function Dashboard(): React.JSX.Element {
   const { totalSpent, monthlySpent, categoryCount } = useExpenseContext();
+  const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
 
   const stats = [
     { label: 'Total Spent',  value: formatCurrency(totalSpent)   },
@@ -36,11 +39,12 @@ export default function Dashboard(): React.JSX.Element {
           ))}
         </div>
 
-        {/* Form region */}
+        {/* Form */}
         <div className="lg:col-span-1">
-          <div className="card-elevated p-5 min-h-[300px] flex items-center justify-center">
-            <p className="text-muted text-sm font-display tracking-wider">FORM</p>
-          </div>
+          <ExpenseForm
+            editingExpense={editingExpense}
+            onCancelEdit={() => setEditingExpense(null)}
+          />
         </div>
 
         {/* List region */}

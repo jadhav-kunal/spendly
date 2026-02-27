@@ -111,7 +111,7 @@ export function useExpenses(): ExpenseContextValue {
       title:        data.title.trim(),
       description:  data.description.trim() || undefined,
       category:     data.category as Expense['category'],
-      amount:       Number(data.amount),
+      amount: parseFloat(parseFloat(data.amount).toFixed(2)),
       expense_date: data.expense_date,
       createdAt:    now,
       updatedAt:    now,
@@ -127,7 +127,7 @@ export function useExpenses(): ExpenseContextValue {
       title:        data.title.trim(),
       description:  data.description.trim() || undefined,
       category:     data.category as Expense['category'],
-      amount:       Number(data.amount),
+      amount: parseFloat(parseFloat(data.amount).toFixed(2)),
       expense_date: data.expense_date,
       updatedAt:    new Date().toISOString(),
     };
