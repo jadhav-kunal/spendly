@@ -1,7 +1,7 @@
-import { useReducer, useMemo, useEffect, useRef } from 'react';
-import toast from 'react-hot-toast';
-import { v4 as uuidv4 } from 'uuid';
+import { useReducer, useMemo, useEffect } from 'react';
 import { expenseReducer, initialState } from '@/reducers/expenseReducer.ts';
+import { expenseService } from '@/services/expenseService.ts';
+import { normalizeExpense, normalizeExpenses } from '@/utils/normalizers.ts';
 import type {
   ExpenseFormData,
   FilterConfig,
@@ -10,45 +10,38 @@ import type {
   Expense,
 } from '@/types/index.ts';
 
-const STORAGE_KEY = 'spendly:expenses';
-
 export function useExpenses(): ExpenseContextValue {
   const [state, dispatch] = useReducer(expenseReducer, initialState);
-  const isHydrated = useRef(false);
 
-  // Hydrate from localStorage on mount
+  // Fetch all expenses on mount
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw) as Expense[];
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          dispatch({ type: 'HYDRATE_FROM_STORAGE', payload: parsed });
-        }
+    async function fetchExpenses() {
+      dispatch({ type: 'SET_LOADING', payload: true });
+      try {
+        const res = await expenseService.getAll();
+        const normalized = normalizeExpenses(
+          res.data.data as Record<string, unknown>[]
+        );
+        dispatch({ type: 'HYDRATE_FROM_STORAGE', payload: normalized });
+      } catch (err) {
+        dispatch({
+          type: 'SET_ERROR',
+          payload: err instanceof Error ? err.message : 'Failed to load expenses',
+        });
+      } finally {
+        dispatch({ type: 'SET_LOADING', payload: false });
       }
-    } catch {
-      localStorage.removeItem(STORAGE_KEY);
     }
-  }, []);
 
-  // Persist on every expenses change — skip the initial empty render
-  // to prevent overwriting stored data before hydration runs
-  useEffect(() => {
-    if (!isHydrated.current) {
-      isHydrated.current = true;
-      return;
-    }
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state.expenses));
-    } catch {
-      // Storage quota exceeded — fail silently
-    }
-  }, [state.expenses]);
+    fetchExpenses();
+  }, []);
 
   // Surface reducer errors as toasts
   useEffect(() => {
     if (state.error) {
-      toast.error(state.error);
+      import('react-hot-toast').then(({ default: toast }) => {
+        toast.error(state.error!);
+      });
       dispatch({ type: 'SET_ERROR', payload: null });
     }
   }, [state.error]);
@@ -100,7 +93,10 @@ export function useExpenses(): ExpenseContextValue {
     return state.expenses
       .filter((e) => {
         const d = new Date(e.expense_date);
-        return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+        return (
+          d.getMonth() === now.getMonth() &&
+          d.getFullYear() === now.getFullYear()
+        );
       })
       .reduce((sum, e) => sum + e.amount, 0);
   }, [state.expenses]);
@@ -112,39 +108,60 @@ export function useExpenses(): ExpenseContextValue {
 
   // ─── Action creators ────────────────────────────────────────────────────────
 
-  function addExpense(data: ExpenseFormData): void {
-    const now = new Date().toISOString();
-    const expense: Expense = {
-      id:           uuidv4(),
-      userId:       'local-user',
-      title:        data.title.trim(),
-      description:  data.description.trim() || undefined,
-      category:     data.category as Expense['category'],
-      amount:       parseFloat(parseFloat(data.amount).toFixed(2)),
-      expense_date: data.expense_date,
-      createdAt:    now,
-      updatedAt:    now,
-    };
-    dispatch({ type: 'ADD_EXPENSE', payload: expense });
+  async function addExpense(data: ExpenseFormData): Promise<void> {
+    dispatch({ type: 'SET_LOADING', payload: true });
+    try {
+      const payload = {
+        ...data,
+        amount: parseFloat(parseFloat(data.amount).toFixed(2)),
+      };
+      const res = await expenseService.create(payload as unknown as ExpenseFormData);
+      const normalized = normalizeExpense(
+        res.data.data as unknown as Record<string, unknown>
+      );
+      dispatch({ type: 'ADD_EXPENSE', payload: normalized });
+    } catch (err) {
+      dispatch({
+        type: 'SET_ERROR',
+        payload: err instanceof Error ? err.message : 'Failed to add expense',
+      });
+    } finally {
+      dispatch({ type: 'SET_LOADING', payload: false });
+    }
   }
 
-  function editExpense(id: string, data: ExpenseFormData): void {
-    const existing = state.expenses.find((e) => e.id === id);
-    if (!existing) return;
-    const updated: Expense = {
-      ...existing,
-      title:        data.title.trim(),
-      description:  data.description.trim() || undefined,
-      category:     data.category as Expense['category'],
-      amount:       parseFloat(parseFloat(data.amount).toFixed(2)),
-      expense_date: data.expense_date,
-      updatedAt:    new Date().toISOString(),
-    };
-    dispatch({ type: 'EDIT_EXPENSE', payload: updated });
+  async function editExpense(id: string, data: ExpenseFormData): Promise<void> {
+    dispatch({ type: 'SET_LOADING', payload: true });
+    try {
+      const payload = {
+        ...data,
+        amount: parseFloat(parseFloat(data.amount).toFixed(2)),
+      };
+      const res = await expenseService.update(id, payload as unknown as Partial<ExpenseFormData>);
+      const normalized = normalizeExpense(
+        res.data.data as unknown as Record<string, unknown>
+      );
+      dispatch({ type: 'EDIT_EXPENSE', payload: normalized });
+    } catch (err) {
+      dispatch({
+        type: 'SET_ERROR',
+        payload: err instanceof Error ? err.message : 'Failed to update expense',
+      });
+    } finally {
+      dispatch({ type: 'SET_LOADING', payload: false });
+    }
   }
 
-  function deleteExpense(id: string): void {
+  async function deleteExpense(id: string): Promise<void> {
     dispatch({ type: 'DELETE_EXPENSE', payload: { id } });
+    try {
+      await expenseService.remove(id);
+    } catch (err) {
+      dispatch({
+        type: 'SET_ERROR',
+        payload: err instanceof Error ? err.message : 'Failed to delete expense',
+      });
+    }
   }
 
   function setFilter(filter: FilterConfig): void {
@@ -171,6 +188,6 @@ export function useExpenses(): ExpenseContextValue {
     totalSpent,
     monthlySpent,
     categoryCount,
-    isLoading: state.loading
+    isLoading: state.loading,
   };
 }

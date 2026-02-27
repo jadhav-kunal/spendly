@@ -71,18 +71,18 @@ export type ExpenseAction =
 // ─── Context Type ─────────────────────────────────────────────────────────────
 
 export interface ExpenseContextValue {
-  state: ExpenseState;
-  addExpense: (data: ExpenseFormData) => void;
-  editExpense: (id: string, data: ExpenseFormData) => void;
-  deleteExpense: (id: string) => void;
-  setFilter: (filter: FilterConfig) => void;
-  setSearch: (search: string) => void;
-  setSort: (sort: SortConfig) => void;
+  state:            ExpenseState;
+  addExpense:       (data: ExpenseFormData) => Promise<void>;
+  editExpense:      (id: string, data: ExpenseFormData) => Promise<void>;
+  deleteExpense:    (id: string) => Promise<void>;
+  setFilter:        (filter: FilterConfig) => void;
+  setSearch:        (search: string) => void;
+  setSort:          (sort: SortConfig) => void;
   filteredExpenses: Expense[];
-  totalSpent: number;
-  monthlySpent: number;
-  categoryCount: number;
-  isLoading: boolean;
+  totalSpent:       number;
+  monthlySpent:     number;
+  categoryCount:    number;
+  isLoading:        boolean;
 }
 
 // ─── API Types ────────────────────────────────────────────────────────────────

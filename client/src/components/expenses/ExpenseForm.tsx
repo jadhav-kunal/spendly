@@ -50,13 +50,13 @@ export default function ExpenseForm({
 
   function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    handleSubmit((data) => {
+    handleSubmit(async (data) => {
       if (isEditing && editingExpense) {
-        editExpense(editingExpense.id, data);
+        await editExpense(editingExpense.id, data);
         toast.success('Expense updated');
         onCancelEdit?.();
       } else {
-        addExpense(data);
+        await addExpense(data);
         toast.success('Expense added');
         resetForm();
       }
