@@ -7,7 +7,6 @@ import type {
   FilterConfig,
   SortConfig,
   ExpenseContextValue,
-  Expense,
 } from '@/types/index.ts';
 
 export function useExpenses(): ExpenseContextValue {
@@ -20,7 +19,7 @@ export function useExpenses(): ExpenseContextValue {
       try {
         const res = await expenseService.getAll();
         const normalized = normalizeExpenses(
-          res.data.data as Record<string, unknown>[]
+          res.data.data as unknown as Record<string, unknown>[]
         );
         dispatch({ type: 'HYDRATE_FROM_STORAGE', payload: normalized });
       } catch (err) {

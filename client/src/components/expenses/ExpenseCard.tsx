@@ -1,7 +1,6 @@
 import React, { memo } from 'react';
 import { Pencil, Trash2, Check, X } from 'lucide-react';
 import { clsx } from 'clsx';
-import CategoryBadge from '@/components/common/CategoryBadge.tsx';
 import { formatCurrency, formatDate } from '@/utils/formatters.ts';
 import type { Expense } from '@/types/index.ts';
 
@@ -52,7 +51,6 @@ const ExpenseCard = memo(function ExpenseCard({
             </p>
             <div className="flex items-center gap-2 mt-0.5 flex-wrap">
               <span className="text-xs text-muted">{formatDate(expense.expense_date)}</span>
-              {/* <CategoryBadge category={expense.category} showLabel={true} /> */}
             </div>
             {expense.description && (
               <p className="text-xs text-muted mt-1 line-clamp-2">{expense.description}</p>
