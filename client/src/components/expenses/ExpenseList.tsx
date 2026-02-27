@@ -11,8 +11,11 @@ interface ExpenseListProps {
 }
 
 const ExpenseList = memo(function ExpenseList({ onEdit }: ExpenseListProps): React.JSX.Element {
-  const { filteredExpenses, deleteExpense } = useExpenseContext();
+  const { filteredExpenses, state, deleteExpense } = useExpenseContext();
   const { isConfirming, requestConfirm, cancelConfirm } = useConfirm();
+
+  const isFiltered =
+    state.filter.category !== 'all' || state.search.trim() !== '';
 
   function handleDeleteConfirm(id: string) {
     deleteExpense(id);
@@ -23,7 +26,7 @@ const ExpenseList = memo(function ExpenseList({ onEdit }: ExpenseListProps): Rea
   if (filteredExpenses.length === 0) {
     return (
       <div className="card-elevated">
-        <EmptyState />
+        <EmptyState filtered={isFiltered} />
       </div>
     );
   }

@@ -3,6 +3,7 @@ import { useExpenseContext } from '@/context/ExpenseContext.tsx';
 import { formatCurrency } from '@/utils/formatters.ts';
 import ExpenseForm from '@/components/expenses/ExpenseForm.tsx';
 import ExpenseList from '@/components/expenses/ExpenseList.tsx';
+import FilterBar from '@/components/expenses/FilterBar.tsx';
 import type { Expense } from '@/types/index.ts';
 
 export default function Dashboard(): React.JSX.Element {
@@ -48,8 +49,9 @@ export default function Dashboard(): React.JSX.Element {
           />
         </div>
 
-        {/* List */}
+        {/* List + filters */}
         <div className="lg:col-span-2">
+          <FilterBar />
           <ExpenseList onEdit={(expense) => setEditingExpense(expense)} />
         </div>
 

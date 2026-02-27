@@ -1,4 +1,4 @@
-import { useReducer, useMemo, useEffect } from 'react';
+import { useReducer, useMemo, useEffect, useRef } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { expenseReducer, initialState } from '@/reducers/expenseReducer.ts';
 import type {
@@ -11,11 +11,9 @@ import type {
 
 const STORAGE_KEY = 'spendly:expenses';
 
-/**
- * useExpenses — encapsulates all expense state logic.
- */
 export function useExpenses(): ExpenseContextValue {
   const [state, dispatch] = useReducer(expenseReducer, initialState);
+  const isHydrated = useRef(false);
 
   // Hydrate from localStorage on mount
   useEffect(() => {
@@ -23,7 +21,7 @@ export function useExpenses(): ExpenseContextValue {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) {
         const parsed = JSON.parse(raw) as Expense[];
-        if (Array.isArray(parsed)) {
+        if (Array.isArray(parsed) && parsed.length > 0) {
           dispatch({ type: 'HYDRATE_FROM_STORAGE', payload: parsed });
         }
       }
@@ -32,8 +30,13 @@ export function useExpenses(): ExpenseContextValue {
     }
   }, []);
 
-  // Persist on every expenses change
+  // Persist on every expenses change — skip the initial empty render
+  // to prevent overwriting stored data before hydration runs
   useEffect(() => {
+    if (!isHydrated.current) {
+      isHydrated.current = true;
+      return;
+    }
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state.expenses));
     } catch {
@@ -46,12 +49,10 @@ export function useExpenses(): ExpenseContextValue {
   const filteredExpenses = useMemo(() => {
     let result = [...state.expenses];
 
-    // Filter by category
     if (state.filter.category !== 'all') {
       result = result.filter((e) => e.category === state.filter.category);
     }
 
-    // Filter by search term (title match, case-insensitive)
     if (state.search.trim()) {
       const term = state.search.toLowerCase();
       result = result.filter(
@@ -61,7 +62,6 @@ export function useExpenses(): ExpenseContextValue {
       );
     }
 
-    // Sort
     result.sort((a, b) => {
       const { field, direction } = state.sort;
       let aVal: number;
@@ -111,7 +111,7 @@ export function useExpenses(): ExpenseContextValue {
       title:        data.title.trim(),
       description:  data.description.trim() || undefined,
       category:     data.category as Expense['category'],
-      amount: parseFloat(parseFloat(data.amount).toFixed(2)),
+      amount:       parseFloat(parseFloat(data.amount).toFixed(2)),
       expense_date: data.expense_date,
       createdAt:    now,
       updatedAt:    now,
@@ -127,7 +127,7 @@ export function useExpenses(): ExpenseContextValue {
       title:        data.title.trim(),
       description:  data.description.trim() || undefined,
       category:     data.category as Expense['category'],
-      amount: parseFloat(parseFloat(data.amount).toFixed(2)),
+      amount:       parseFloat(parseFloat(data.amount).toFixed(2)),
       expense_date: data.expense_date,
       updatedAt:    new Date().toISOString(),
     };
