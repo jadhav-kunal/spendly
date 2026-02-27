@@ -4,10 +4,11 @@ import { formatCurrency } from '@/utils/formatters.ts';
 import ExpenseForm from '@/components/expenses/ExpenseForm.tsx';
 import ExpenseList from '@/components/expenses/ExpenseList.tsx';
 import FilterBar from '@/components/expenses/FilterBar.tsx';
+import StatCardSkeleton from '@/components/common/StatCardSkeleton.tsx';
 import type { Expense } from '@/types/index.ts';
 
 export default function Dashboard(): React.JSX.Element {
-  const { totalSpent, monthlySpent, categoryCount } = useExpenseContext();
+  const { totalSpent, monthlySpent, categoryCount, isLoading } = useExpenseContext();
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
 
   const stats = [
@@ -31,14 +32,17 @@ export default function Dashboard(): React.JSX.Element {
 
         {/* Stats */}
         <div className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {stats.map((stat) => (
-            <div key={stat.label} className="card-elevated p-5 animate-slide-up">
-              <p className="label">{stat.label}</p>
-              <p className="font-display font-bold text-2xl text-white mt-1">
-                {stat.value}
-              </p>
-            </div>
-          ))}
+          {isLoading
+            ? Array.from({ length: 3 }).map((_, i) => <StatCardSkeleton key={i} />)
+            : stats.map((stat) => (
+                <div key={stat.label} className="card-elevated p-5 animate-slide-up">
+                  <p className="label">{stat.label}</p>
+                  <p className="font-display font-bold text-2xl text-white mt-1">
+                    {stat.value}
+                  </p>
+                </div>
+              ))
+          }
         </div>
 
         {/* Form */}

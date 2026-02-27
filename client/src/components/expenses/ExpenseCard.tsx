@@ -52,7 +52,7 @@ const ExpenseCard = memo(function ExpenseCard({
             </p>
             <div className="flex items-center gap-2 mt-0.5 flex-wrap">
               <span className="text-xs text-muted">{formatDate(expense.expense_date)}</span>
-              <CategoryBadge category={expense.category} showLabel={false} />
+              {/* <CategoryBadge category={expense.category} showLabel={true} /> */}
             </div>
             {expense.description && (
               <p className="text-xs text-muted mt-1 line-clamp-2">{expense.description}</p>

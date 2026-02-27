@@ -1,4 +1,5 @@
 import { useReducer, useMemo, useEffect, useRef } from 'react';
+import toast from 'react-hot-toast';
 import { v4 as uuidv4 } from 'uuid';
 import { expenseReducer, initialState } from '@/reducers/expenseReducer.ts';
 import type {
@@ -43,6 +44,14 @@ export function useExpenses(): ExpenseContextValue {
       // Storage quota exceeded — fail silently
     }
   }, [state.expenses]);
+
+  // Surface reducer errors as toasts
+  useEffect(() => {
+    if (state.error) {
+      toast.error(state.error);
+      dispatch({ type: 'SET_ERROR', payload: null });
+    }
+  }, [state.error]);
 
   // ─── Derived state ──────────────────────────────────────────────────────────
 
@@ -162,5 +171,6 @@ export function useExpenses(): ExpenseContextValue {
     totalSpent,
     monthlySpent,
     categoryCount,
+    isLoading: state.loading
   };
 }

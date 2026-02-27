@@ -82,6 +82,7 @@ export interface ExpenseContextValue {
   totalSpent: number;
   monthlySpent: number;
   categoryCount: number;
+  isLoading: boolean;
 }
 
 // ─── API Types ────────────────────────────────────────────────────────────────
