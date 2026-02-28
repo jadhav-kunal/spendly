@@ -15,7 +15,24 @@ export default function AppShell({ children }: AppShellProps): React.JSX.Element
       <footer className="py-4 text-center text-xs text-muted border-t border-border">
         <span className="font-display tracking-wider">SPENDLY</span>
         <span className="mx-2 text-surface-4">·</span>
-        <span>Track every dollar</span>
+        <span>Built by </span>
+        <a
+          href="https://kunalkunal.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-accent hover:text-accent-glow transition-colors font-semibold"
+        >
+          Kunal
+        </a>
+        <span className="mx-1">—</span>
+        <a
+          href="https://kunalkunal.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="hover:text-white transition-colors underline underline-offset-2"
+        >
+          know more about me!
+        </a>
       </footer>
     </div>
   );
